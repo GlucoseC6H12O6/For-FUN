@@ -1,17 +1,13 @@
-import logo from './logo.svg';
-import './app.css';
+FROM artifact.samsungds.net/devops-template-docker/baseimage/node:20-py3.10
 
-function App(){
-	return (
-		<div className="App">
-			<header className="App-header">
-				<img src={logo} className="App-logo" alt="logo" />
-				<p>
-					Hello ! React !
-				</p>
-			</header>
-		</div>
-	);
-}
+WORKDIR /opt/work
+ADD . .
 
-export default App;
+RUN sudo chown $DSUSER:$DSUSER -R /opt/work
+RUN npm i
+RUN npm run build
+
+RUN cp -rp /opt/work/build/* /usr/local/nginx/html
+RUN rm -rf /opt/work/*
+
+CMD ["nginx", "-g", "daemon off;"]
